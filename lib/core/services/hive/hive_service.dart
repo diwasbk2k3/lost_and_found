@@ -1,1 +1,57 @@
+import 'package:hive/hive.dart';
+import 'package:lost_n_found/core/constants/hive_table_constant.dart';
+import 'package:lost_n_found/features/auth/data/models/batch_hive_model.dart';
+import 'package:path_provider/path_provider.dart';
 
+class HiveService {
+  // init
+  Future<void> init() async {
+    final directory = await getApplicationCacheDirectory();
+    final path = '${directory.path}/${HiveTableConstant.dbName}';
+    Hive.init(path);
+    _registerAdapter();
+  }
+
+  // Register Adapter
+  void _registerAdapter() {
+    if (!Hive.isAdapterRegistered(HiveTableConstant.batchTypeId)) {
+      Hive.registerAdapter(BatchHiveModelAdapter());
+    }
+  }
+
+  // Open Boxes
+  Future<void> openBoxes() async {
+    await Hive.openBox<BatchHiveModel>(HiveTableConstant.batchTable);
+  }
+
+  // Close Boxes
+  Future<void> close() async {
+    await Hive.close();
+  }
+
+  // ==================== BATCH QUERIES ====================
+  Box<BatchHiveModel> get _batchBox =>
+      Hive.box<BatchHiveModel>(HiveTableConstant.batchTable);
+
+  // Create
+
+  Future<BatchHiveModel> createBatch(BatchHiveModel model) async {
+    await _batchBox.put(model.batchId, model);
+    return model;
+  }
+
+  // Get All Batch
+  List<BatchHiveModel> getAllBatches() {
+    return _batchBox.values.toList();
+  }
+
+  // Update
+  Future<void> updateBatch(BatchHiveModel model) async {
+    await _batchBox.put(model.batchId, model);
+  }
+
+  // Delete
+  Future<void> deleteBatch(String batchId) async {
+    await _batchBox.delete(batchId);
+  }
+}
