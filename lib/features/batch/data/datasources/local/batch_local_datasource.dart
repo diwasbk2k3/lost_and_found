@@ -1,6 +1,6 @@
 import 'package:lost_n_found/core/services/hive/hive_service.dart';
-import 'package:lost_n_found/features/auth/data/datasources/remote/batch_datasource.dart';
-import 'package:lost_n_found/features/auth/data/models/batch_hive_model.dart';
+import 'package:lost_n_found/features/batch/data/datasources/batch_datasource.dart';
+import 'package:lost_n_found/features/batch/data/models/batch_hive_model.dart';
 
 class BatchLocalDatasource implements IBatchDataSource {
   final HiveService _hiveService;
