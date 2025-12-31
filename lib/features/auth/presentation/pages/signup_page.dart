@@ -62,7 +62,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
 
     if (_formKey.currentState!.validate()) {
-      // yaha ko data lai view modeel ma pass garne
+      // yaha ko data lai view model ma pass garne
       ref
           .read(authViewModelProvider.notifier)
           .register(
