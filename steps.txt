@@ -6,4 +6,5 @@ step3: features --> batch --> entities --> batch_entity
 
 Auth features
 
-// step 1: domain bhitra entities bhitra auth entity banauni
+// step 1: auth ko domain bhitra entities bhitra auth entity banauni
+// step 2: auth ko domain bhitra repository bhitra auth repository banauni
