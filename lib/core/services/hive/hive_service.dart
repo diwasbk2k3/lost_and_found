@@ -96,8 +96,13 @@ class HiveService {
     return model;
   }
 
+  // Register
+  Future<void> registerUser(AuthHiveModel model) async {
+    await _authBox.put(model.authId, model);
+  }
+  
   // Login
-  Future<AuthHiveModel?> logiUser(String username, String password) async {
+  Future<AuthHiveModel?> loginUser(String username, String password) async {
     final users = _authBox.values.where(
       (user) => user.username == username && user.password == password,
     );
@@ -108,12 +113,16 @@ class HiveService {
   }
 
   // Logout
-  Future<void> logoutUser(String authId) async {
-    await _authBox.delete(authId);
-  }
+  Future<void> logoutUser() async {}
 
   // Get Current User
   AuthHiveModel? getCurrentUser(String authId) {
     return _authBox.get(authId);
+  }
+
+  // Is Email Exists
+  Future<bool> isEmailExists(String email) {
+    final users = _authBox.values.where((user) => user.email == email);
+    return Future.value(users.isNotEmpty);
   }
 }
