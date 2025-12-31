@@ -4,7 +4,7 @@ import 'package:lost_n_found/core/constants/hive_table_constant.dart';
 import 'package:lost_n_found/features/batch/data/models/batch_hive_model.dart';
 import 'package:path_provider/path_provider.dart';
 
-final hiveServiceProvider = Provider<HiveService>((ref){
+final hiveServiceProvider = Provider<HiveService>((ref) {
   return HiveService();
 });
 
@@ -15,6 +15,26 @@ class HiveService {
     final path = '${directory.path}/${HiveTableConstant.dbName}';
     Hive.init(path);
     _registerAdapter();
+    await openBoxes();
+    await insertDummyBatches();
+  }
+
+  Future<void> insertDummyBatches() async {
+    final box = Hive.box<BatchHiveModel>(HiveTableConstant.batchTable);
+    if (box.isNotEmpty) return;
+    final dummyBatches = [
+      BatchHiveModel(batchName: "35-A"),
+      BatchHiveModel(batchName: "35-B"),
+      BatchHiveModel(batchName: "35-C"),
+      BatchHiveModel(batchName: "36-A"),
+      BatchHiveModel(batchName: "36-B"),
+      BatchHiveModel(batchName: "36-C"),
+    ];
+
+    for (var batch in dummyBatches) {
+      await box.put(batch.batchId, batch);
+    }
+    await box.close();
   }
 
   // Register Adapter

@@ -3,7 +3,7 @@ import 'package:lost_n_found/core/constants/hive_table_constant.dart';
 import 'package:lost_n_found/features/batch/domain/entities/batch_entity.dart';
 import 'package:uuid/uuid.dart';
 
-part 'batch_hive_model.g.dart';  // dart run build_runner build -d
+part 'batch_hive_model.g.dart'; // dart run build_runner build -d
 
 // Box
 // Adapter: binary lai object ma convert
@@ -24,7 +24,11 @@ class BatchHiveModel extends HiveObject {
       status = status ?? 'active';
 
   BatchEntity toEntity() {
-    return BatchEntity(batchId: batchId, batchName: batchName, status: status);
+    return BatchEntity(
+      batchId: batchId,
+      batchName: 'KTM $batchName',
+      status: status,
+    );
   }
 
   // from Entity
