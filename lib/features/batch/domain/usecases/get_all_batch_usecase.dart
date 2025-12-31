@@ -11,7 +11,7 @@ class GetAllBatchUsecase implements UseCaseWithoutParams<List<BatchEntity>> {
     : _batchRepository = batchRepository;
 
   @override
-  Future<Either<Failure, List<BatchEntity>>> createBatch() {
+  Future<Either<Failure, List<BatchEntity>>> call() {
     return _batchRepository.getAllBatches();
   }
 }

@@ -30,7 +30,7 @@ class UpdateBatchUsecase
     : _batchRepository = batchRepository;
 
   @override
-  Future<Either<Failure, bool>> createBatch(UpdateBatchUsecaseParams params) {
+  Future<Either<Failure, bool>> call(UpdateBatchUsecaseParams params) {
     BatchEntity batchEntity = BatchEntity(
       batchId: params.batchId,
       batchName: params.batchName,
