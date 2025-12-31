@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:lost_n_found/core/constants/hive_table_constant.dart';
+import 'package:lost_n_found/features/auth/data/models/auth_hive_model.dart';
 import 'package:lost_n_found/features/batch/data/models/batch_hive_model.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -42,11 +43,17 @@ class HiveService {
     if (!Hive.isAdapterRegistered(HiveTableConstant.batchTypeId)) {
       Hive.registerAdapter(BatchHiveModelAdapter());
     }
+
+    // Register other adapters here
+    if (!Hive.isAdapterRegistered(HiveTableConstant.authTypeId)) {
+      Hive.registerAdapter(AuthHiveModelAdapter());
+    }
   }
 
   // Open Boxes
   Future<void> openBoxes() async {
     await Hive.openBox<BatchHiveModel>(HiveTableConstant.batchTable);
+    await Hive.openBox<AuthHiveModel>(HiveTableConstant.authTable);
   }
 
   // Close Boxes
@@ -78,5 +85,35 @@ class HiveService {
   // Delete
   Future<void> deleteBatch(String batchId) async {
     await _batchBox.delete(batchId);
+  }
+
+  // ==================== AUTH QUERIES ====================
+  Box<AuthHiveModel> get _authBox =>
+      Hive.box<AuthHiveModel>(HiveTableConstant.authTable);
+
+  Future<AuthHiveModel> createAuth(AuthHiveModel model) async {
+    await _authBox.put(model.authId, model);
+    return model;
+  }
+
+  // Login
+  Future<AuthHiveModel?> logiUser(String username, String password) async {
+    final users = _authBox.values.where(
+      (user) => user.username == username && user.password == password,
+    );
+    if (users.isNotEmpty) {
+      return users.first;
+    }
+    return null;
+  }
+
+  // Logout
+  Future<void> logoutUser(String authId) async {
+    await _authBox.delete(authId);
+  }
+
+  // Get Current User
+  AuthHiveModel? getCurrentUser(String authId) {
+    return _authBox.get(authId);
   }
 }

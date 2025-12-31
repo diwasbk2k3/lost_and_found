@@ -9,3 +9,4 @@ Auth features
 // step 1: auth ko domain bhitra entities bhitra auth entity banauni
 // step 2: auth ko domain bhitra repository bhitra auth repository banauni
 // step 3: auth ko data bhitra ko models bhitra auth hive models ( dart run build_runner build -d )
+// step 4: lib ko core ko services ko hive bhitra hive_service.dart banauni
