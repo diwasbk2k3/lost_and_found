@@ -15,3 +15,4 @@ Auth features
 // step 7: auth ko data ko repositories ma auth_repository.dart banauni
 // step 8: auth ko domain ko usecases bhitra register_usecase.dart, login_usecase.dart, logout_usecase.dart, ani get_currentuser_usecase.dart banauni
 // step 9: auth ko presentation ko state ma auth_state.dart banauni
+// step 10: auth ko presentation ko view_model ma auth_view_model.dart banauni
