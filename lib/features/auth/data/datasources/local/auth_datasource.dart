@@ -1,19 +1,28 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lost_n_found/core/services/hive/hive_service.dart';
+import 'package:lost_n_found/core/services/storage/user_session_service.dart';
 import 'package:lost_n_found/features/auth/data/datasources/auth_datasource.dart';
 import 'package:lost_n_found/features/auth/data/models/auth_hive_model.dart';
 
 // Provide implementation for Auth Local Datasource
 final authLocalDatasourceProvider = Provider<AuthLocalDatasource>((ref) {
-  final hiveService = ref.watch(hiveServiceProvider);
-  return AuthLocalDatasource(hiveService: hiveService);
+  final hiveService = ref.read(hiveServiceProvider);
+  final userSessionService = ref.read(userSessionServiceProvider);
+  return AuthLocalDatasource(
+    hiveService: hiveService,
+    userSessionService: userSessionService,
+  );
 });
 
 class AuthLocalDatasource implements IAuthDatasource {
   final HiveService _hiveService;
+  final UserSessionService _userSessionService;
 
-  AuthLocalDatasource({required HiveService hiveService})
-    : _hiveService = hiveService;
+  AuthLocalDatasource({
+    required HiveService hiveService,
+    required UserSessionService userSessionService,
+  }) : _hiveService = hiveService,
+       _userSessionService = userSessionService;
 
   @override
   Future<AuthHiveModel?> getCurrentUser() {
@@ -31,7 +40,20 @@ class AuthLocalDatasource implements IAuthDatasource {
   Future<bool> login(String email, String password) async {
     try {
       final user = await _hiveService.loginUser(email, password);
-      return Future.value(user != null);
+      // Store user session data if login is successful
+      if(user != null) {
+        await _userSessionService.storeUserSession(
+          isLoggedIn: true,
+          userId: user.authId!,
+          email: user.email,
+          username: user.username,
+          fullName: user.fullName,
+          phoneNumber: user.phoneNumber,
+          batchId: user.batchId,
+          profilePicture: user.profilePicture ?? "",
+        );
+      } 
+      return user != null;
     } catch (e) {
       return Future.value(false);
     }
