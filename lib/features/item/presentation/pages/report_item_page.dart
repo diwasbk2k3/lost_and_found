@@ -431,7 +431,6 @@ class _ReportItemPageState extends State<ReportItemPage> {
                       GestureDetector(
                         onTap: () {
                           if (_formKey.currentState!.validate()) {
-                            // TODO: Submit the form
                             SnackbarUtils.showSuccess(
                               context,
                               _isLostItem

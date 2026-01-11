@@ -302,7 +302,6 @@ class _MyItemsPageState extends State<MyItemsPage>
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // TODO: Delete item
             },
             child: Text(
               'Delete',
