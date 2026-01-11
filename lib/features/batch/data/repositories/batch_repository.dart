@@ -12,9 +12,9 @@ final batchRepositoryProvider = Provider<IBatchRepository>((ref) {
 });
 
 class BatchRepository implements IBatchRepository {
-  final IBatchDataSource _dataSource;
+  final IBatchLocalDataSource _dataSource;
 
-  BatchRepository({required IBatchDataSource datasource})
+  BatchRepository({required IBatchLocalDataSource datasource})
     : _dataSource = datasource;
 
   @override
