@@ -54,6 +54,22 @@ class AuthApiModel {
     );
   }
 
+  // from Entity
+  factory AuthApiModel.fromEntity(AuthEntity entity) {
+    return AuthApiModel(
+      fullName: entity.fullName,
+      email: entity.email,
+      phoneNumber: entity.phoneNumber,
+      username: entity.username,
+      password: entity.password,
+      batchId: entity.batchId,
+      profilePicture: entity.profilePicture,
+      batch: entity.batch != null
+          ? BatchApiModel.fromEntity(entity.batch!)
+          : null,
+    );
+  }
+  
   // toEntity
   AuthEntity toEntity() {
     return AuthEntity(
@@ -71,5 +87,5 @@ class AuthApiModel {
   // toEntity List
   static List<AuthEntity> toEntityList(List<AuthApiModel> models) {
     return models.map((model) => model.toEntity()).toList();
-  } 
+  }
 }
