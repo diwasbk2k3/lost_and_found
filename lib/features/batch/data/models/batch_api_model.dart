@@ -22,7 +22,7 @@ class BatchApiModel {
   }
 
   // to Entity
-  BatchEntity toEntiry() {
+  BatchEntity toEntity() {
     return BatchEntity(
       batchId: id,
       batchName: 'UK - $batchName',
@@ -37,6 +37,6 @@ class BatchApiModel {
 
   // toEntity List
   static List<BatchEntity> toEntityList(List<BatchApiModel> models) {
-    return models.map((model) => model.toEntiry()).toList();
+    return models.map((model) => model.toEntity()).toList();
   }
 }
