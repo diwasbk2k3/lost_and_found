@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
 import '../../../../core/utils/snackbar_utils.dart';
@@ -34,6 +36,139 @@ class _ReportItemPageState extends State<ReportItemPage> {
     _descriptionController.dispose();
     _locationController.dispose();
     super.dispose();
+  }
+
+  final List<XFile> _selectedMedia = []; // images.. video
+  final ImagePicker _imagePicker = ImagePicker();
+
+  Future<bool> _userSangaPermissionMagnu(Permission permission) async {
+    final status = await permission.status;
+    if (status.isGranted) {
+      return true;
+    }
+
+    if (status.isDenied) {
+      final result = await permission.request();
+      return result.isGranted;
+    }
+
+    if (status.isPermanentlyDenied) {
+      _showPermissionDeniedDialog();
+      return false;
+    }
+
+    return false;
+  }
+
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (contex) => AlertDialog(
+        title: Text("Permission Dinus"),
+        content: Text(
+          "Yo feature haru use garna lai permission settings ma janu hola.",
+        ),
+        actions: [
+          TextButton(onPressed: () {}, child: Text("Cancel")),
+          TextButton(onPressed: () {}, child: Text("Open Settings")),
+        ],
+      ),
+    );
+  }
+
+  // code for camera
+  Future<void> _pickFromCamera() async {
+    final hasPermission = await _userSangaPermissionMagnu(Permission.camera);
+    if (!hasPermission) {
+      return;
+    }
+
+    final XFile? photo = await _imagePicker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 80,
+    );
+
+    if (photo != null) {
+      setState(() {
+        _selectedMedia.clear();
+        _selectedMedia.add(photo);
+      });
+    }
+  }
+
+  // code for gallery
+  Future<void> _pickFromGallery({bool allowMultiple = false}) async {
+    try {
+      if (allowMultiple) {
+        final List<XFile> images = await _imagePicker.pickMultiImage(
+          imageQuality: 80,
+        );
+        if (images.isNotEmpty) {
+          setState(() {
+            _selectedMedia.clear();
+            _selectedMedia.addAll(images);
+          });
+        }
+      } else {
+        final XFile? image = await _imagePicker.pickImage(
+          source: ImageSource.gallery,
+          imageQuality: 80,
+        );
+        if (image != null) {
+          setState(() {
+            setState(() {
+              _selectedMedia.clear();
+              _selectedMedia.add(image);
+            });
+          });
+        }
+      }
+    } catch (err) {
+      debugPrint("Gallery Error $err");
+      if (mounted) {
+        SnackbarUtils.showError(
+          context,
+          "Tapai ko gallery access garna payena, kripaya permission deyara camera kholnus ani photo khichnus",
+        );
+      }
+    }
+  }
+
+  // Code for Video
+  Future<void> _pickFromVideo() async {
+    return Future.value(true);
+  }
+
+  // Code for DialogBox: showDialog for menu
+  Future<void> _pickMedia() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.camera),
+                title: Text("Open Camera"),
+                onTap: _pickFromCamera,
+              ),
+              ListTile(
+                leading: Icon(Icons.browse_gallery),
+                title: Text("Open Gallery"),
+                onTap: _pickFromGallery,
+              ),
+              ListTile(
+                leading: Icon(Icons.video_camera_back_outlined),
+                title: Text("Record Video"),
+                onTap: _pickFromVideo,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -106,7 +241,9 @@ class _ReportItemPageState extends State<ReportItemPage> {
                                 },
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
                                   decoration: BoxDecoration(
                                     gradient: _isLostItem
                                         ? AppColors.lostGradient
@@ -148,7 +285,9 @@ class _ReportItemPageState extends State<ReportItemPage> {
                                 },
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
                                   decoration: BoxDecoration(
                                     gradient: !_isLostItem
                                         ? AppColors.foundGradient
@@ -202,7 +341,7 @@ class _ReportItemPageState extends State<ReportItemPage> {
                           // Add Photo Button
                           GestureDetector(
                             onTap: () {
-                              // TODO: Implement image picker
+                              _pickMedia();
                             },
                             child: Container(
                               width: 100,
@@ -301,7 +440,8 @@ class _ReportItemPageState extends State<ReportItemPage> {
                         spacing: 10,
                         runSpacing: 10,
                         children: _categories.map((category) {
-                          final isSelected = _selectedCategory == category['name'];
+                          final isSelected =
+                              _selectedCategory == category['name'];
                           return GestureDetector(
                             onTap: () {
                               setState(() {
@@ -317,8 +457,8 @@ class _ReportItemPageState extends State<ReportItemPage> {
                               decoration: BoxDecoration(
                                 gradient: isSelected
                                     ? (_isLostItem
-                                        ? AppColors.lostGradient
-                                        : AppColors.foundGradient)
+                                          ? AppColors.lostGradient
+                                          : AppColors.foundGradient)
                                     : null,
                                 color: isSelected ? null : Colors.white,
                                 borderRadius: BorderRadius.circular(12),
@@ -376,8 +516,7 @@ class _ReportItemPageState extends State<ReportItemPage> {
                             hintText: _isLostItem
                                 ? 'Where did you lose it?'
                                 : 'Where did you find it?',
-                            hintStyle:
-                                TextStyle(color: AppColors.textTertiary),
+                            hintStyle: TextStyle(color: AppColors.textTertiary),
                             prefixIcon: Icon(
                               Icons.location_on_rounded,
                               color: context.textSecondary,
@@ -462,7 +601,9 @@ class _ReportItemPageState extends State<ReportItemPage> {
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                _isLostItem ? 'Report Lost Item' : 'Report Found Item',
+                                _isLostItem
+                                    ? 'Report Lost Item'
+                                    : 'Report Found Item',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
