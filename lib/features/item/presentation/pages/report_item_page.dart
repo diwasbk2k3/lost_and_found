@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -136,7 +138,31 @@ class _ReportItemPageState extends State<ReportItemPage> {
 
   // Code for Video
   Future<void> _pickFromVideo() async {
-    return Future.value(true);
+    try {
+      final hasPermission = await _userSangaPermissionMagnu(Permission.camera);
+      if (!hasPermission) {
+        return;
+      }
+      final hasMicPermission = await _userSangaPermissionMagnu(
+        Permission.microphone,
+      );
+      if (!hasMicPermission) {
+        return;
+      }
+      final XFile? video = await _imagePicker.pickVideo(
+        source: ImageSource.camera,
+        maxDuration: Duration(minutes: 1),
+      );
+
+      if (video != null) {
+        setState(() {
+          _selectedMedia.clear();
+          _selectedMedia.add(video);
+        });
+      }
+    } catch (err) {
+      _showPermissionDeniedDialog();
+    }
   }
 
   // Code for DialogBox: showDialog for menu
@@ -152,17 +178,26 @@ class _ReportItemPageState extends State<ReportItemPage> {
               ListTile(
                 leading: Icon(Icons.camera),
                 title: Text("Open Camera"),
-                onTap: _pickFromCamera,
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickFromCamera;
+                },
               ),
               ListTile(
                 leading: Icon(Icons.browse_gallery),
                 title: Text("Open Gallery"),
-                onTap: _pickFromGallery,
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickFromGallery;
+                },
               ),
               ListTile(
                 leading: Icon(Icons.video_camera_back_outlined),
                 title: Text("Record Video"),
-                onTap: _pickFromVideo,
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickFromVideo;
+                },
               ),
             ],
           ),
@@ -390,6 +425,44 @@ class _ReportItemPageState extends State<ReportItemPage> {
                       ),
 
                       const SizedBox(height: 24),
+
+                      if (_selectedMedia.isNotEmpty) ...{
+                        Stack(
+                          children: [
+                            Container(
+                              width: 200,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                image: DecorationImage(
+                                  image: FileImage(
+                                    File(_selectedMedia[0].path),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedMedia.clear();
+                                  });
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  padding: EdgeInsets.all(4),
+                                  child: Icon(Icons.close, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      },
 
                       // Item Title
                       Text(
