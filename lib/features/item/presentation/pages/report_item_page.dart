@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lost_n_found/features/item/presentation/view_model/item_viewmodel.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_extensions.dart';
@@ -96,6 +97,9 @@ class _ReportItemPageState extends State<ReportItemPage> {
         _selectedMedia.add(photo);
       });
     }
+
+    // upload image to server
+    await ref.read(itemViewModelProvider.notifier).uploadPhoto(File(photo.path));
   }
 
   // code for gallery
@@ -124,6 +128,8 @@ class _ReportItemPageState extends State<ReportItemPage> {
             });
           });
         }
+
+        await ref.read(itemViewModelProvider.notifier).uploadPhoto(File(image.path));
       }
     } catch (err) {
       debugPrint("Gallery Error $err");
