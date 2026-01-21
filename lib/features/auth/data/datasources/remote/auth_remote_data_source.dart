@@ -7,7 +7,6 @@ import 'package:lost_n_found/features/auth/data/models/auth_api_model.dart';
 
 // Provider
 final authRemoteDatasoureProvider = Provider<IAuthRemoteDatasource>((ref) {
-  ;
   return AuthRemoteDataSource(
     apiClient: ref.read(apiClientProvider),
     userSessionService: ref.read(userSessionServiceProvider),
